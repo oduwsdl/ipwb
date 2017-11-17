@@ -9,11 +9,11 @@ before_script:
 install:
   - pip install -r requirements.txt
   - pip install -r test-requirements.txt
-  - pip install pep8
+  - pip install pycodestyle
   - pip install codecov
   - pip install pytest-cov
 script:
-  - pep8
+  - pycodestyle
   - ipfs init
   - ipfs daemon & sleep 10; pytest
   - py.test --cov=./
