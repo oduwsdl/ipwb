@@ -437,7 +437,7 @@ def getCompleteURI(uri):
 def showMementoAtDatetime(urir, datetime):
     urir = getCompleteURI(urir)
     datetime = datetime.ljust(14, '0')
-    return show_uri(urir, datetime)
+    return redirect("/memento/{0}/{1}".format(datetime, urir), code=301)
 
 
 @app.errorhandler(Exception)
