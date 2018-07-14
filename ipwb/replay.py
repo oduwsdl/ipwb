@@ -20,7 +20,6 @@ import pkg_resources
 import surt
 import re
 import traceback
-import signal
 from pywb.utils.binsearch import iter_exact
 from pywb.utils.canonicalize import unsurt
 # from pywb.utils.canonicalize import canonicalize as surt
@@ -36,6 +35,9 @@ from socket import error as socketerror
 from urlparse import urlsplit, urlunsplit  # N/A in Py3!
 
 import requests
+
+from threading import Thread
+import time
 
 import util as ipwbUtils
 from util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
@@ -525,6 +527,14 @@ def getRequestedSetting(requestedSetting):
     return Response(ipwbUtils.getIPFSAPIHostAndPort() + '/webui')
 
 
+# Lookup digest in IPFS and populate the 'message' dic using specified key.
+# The key here could either be 'header' or 'payload'.
+# Using the mutable 'message' dict instead of returning a value due to the
+# asynchronous nature of threads which is being utilized to call this function.
+def loadFromIPFS(digest, message, key):
+    message[key] = IPFS_API.cat(digest)
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def show_uri(path, datetime=None):
@@ -578,24 +588,29 @@ def show_uri(path, datetime=None):
 
     digests = jObj['locator'].split('/')
 
-    class HashNotFoundError(Exception):
-        pass
-
-    payload = None
     header = None
+    payload = None
     try:
-        def handler(signum, frame):
-            raise HashNotFoundError()
-
-        if os.name != 'nt':  # Bug #310
-            signal.signal(signal.SIGALRM, handler)
-            signal.alarm(10)
-
-        payload = IPFS_API.cat(digests[-1])
-        header = IPFS_API.cat(digests[-2])
-
-        if os.name != 'nt':  # Bug #310
-            signal.alarm(0)
+        message = {'header': None, 'payload': None}
+        fetchHeader = Thread(target=loadFromIPFS,
+                             args=(digests[-2], message, 'header'))
+        fetchPayload = Thread(target=loadFromIPFS,
+                              args=(digests[-1], message, 'payload'))
+        IPFSTIMEOUT = 10
+        fetch_start = time.time()
+        fetchHeader.start()
+        fetchPayload.start()
+        fetchHeader.join(IPFSTIMEOUT)
+        fetchPayload.join(IPFSTIMEOUT - (time.time() - fetch_start))
+        header = message['header']
+        payload = message['payload']
+        if (time.time() - fetch_start) >= IPFSTIMEOUT:
+            if payload is None:
+                print("Hashes not found")
+                return '', 404
+            else:  # payload found but not header, fabricate header
+                print("HTTP header not found, fabricating for resp replay")
+                header = ''
 
     except ipfsapi.exceptions.TimeoutError:
         print("{0} not found at {1}".format(cdxjParts[0], digests[-1]))
@@ -607,14 +622,8 @@ def show_uri(path, datetime=None):
         print('A type error occurred')
         print(traceback.format_exc())
         print(sys.exc_info()[0])
-    except HashNotFoundError:
-        if payload is None:
-            print("Hashes not found")
-            return '', 404
-        else:  # payload found but not header, fabricate header
-            print("HTTP header not found, fabricating for resp replay")
-            header = ''
     except Exception as e:
+        print(e)
         print('Unknown exception occurred while fetching from ipfs.')
         print(sys.exc_info()[0])
         sys.exit()
