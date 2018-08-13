@@ -27,7 +27,8 @@ setup(
         'ipfsapi>=0.4.2',
         'Flask==0.12.2',
         'pycryptodome>=3.4.11',
-        'requests>=2.19.1'
+        'requests>=2.19.1',
+        'six'
     ],
     tests_require=[
         'flake8>=3.4',

@@ -1,5 +1,5 @@
 # Use Python 2.7 as default, but facilitate change at build time
-ARG        PYTHON_TAG=2.7
+ARG        PYTHON_TAG=3.7.0
 FROM       python:${PYTHON_TAG} AS base
 
 # Add some metadata

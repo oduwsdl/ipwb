@@ -5,7 +5,7 @@ import json
 
 from ipwb import indexer
 
-import testUtil as ipwbTest
+from . import testUtil as ipwbTest
 
 
 def isValidSURT(surt):

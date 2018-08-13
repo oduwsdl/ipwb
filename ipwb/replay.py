@@ -32,13 +32,15 @@ from ipfsapi.exceptions import StatusError as hashNotInIPFS
 from bisect import bisect_left
 from socket import gaierror
 from socket import error as socketerror
-from urlparse import urlsplit, urlunsplit  # N/A in Py3!
+# from urlparse import urlsplit, urlunsplit  # N/A in Py3!
+
+from six.moves.urllib.parse import urlsplit, urlunsplit
 
 from requests.exceptions import HTTPError
 
-import util as ipwbUtils
-from util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
-from util import INDEX_FILE
+from . import util as ipwbUtils
+from .util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
+from .util import INDEX_FILE
 
 from base64 import b64decode
 from Crypto.Cipher import AES
@@ -47,7 +49,7 @@ from Crypto.Util.Padding import pad
 import base64
 
 from werkzeug.routing import BaseConverter
-from __init__ import __version__ as ipwbVersion
+from .__init__ import __version__ as ipwbVersion
 
 
 app = Flask(__name__)
@@ -82,15 +84,16 @@ def showWebUI(path):
                 iFile = iFileAbs  # Local file
 
         (mCount, uniqueURIRs) = retrieveMemCount(iFile)
+
         content = content.replace(
-            'MEMCOUNT', str(mCount))
+            b'MEMCOUNT', str(mCount))
         content = content.replace(
-            'UNIQUE', str(uniqueURIRs))
+            b'UNIQUE', str(uniqueURIRs))
 
         content = content.replace(
             'let uris = []',
             'let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)))
-        content = content.replace('INDEXSRC', iFile)
+        content = content.replace(b'INDEXSRC', iFile)
 
     fileExtension = os.path.splitext(path)[1]
 

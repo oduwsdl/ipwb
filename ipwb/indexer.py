@@ -30,7 +30,7 @@ from ipfsapi.exceptions import ConnectionError
 
 from six.moves import input
 
-from util import IPFSAPI_HOST, IPFSAPI_PORT
+from .util import IPFSAPI_HOST, IPFSAPI_PORT
 
 # from warcio.archiveiterator import ArchiveIterator
 
@@ -41,7 +41,7 @@ from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad
 import base64
 
-from __init__ import __version__ as ipwbVersion
+from .__init__ import __version__ as ipwbVersion
 
 DEBUG = False
 
@@ -54,11 +54,14 @@ def pushToIPFS(hstr, payload):
     retryCount = 0
     while retryCount < ipfsRetryCount:
         try:
-            httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr))
-            payloadIPFSHash = pushBytesToIPFS(bytes(payload))
+            httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr, 'utf-8'))
+            print('b')
+            payloadIPFSHash = pushBytesToIPFS(bytes(payload, 'utf-8'))
+            print('c')
             if retryCount > 0:
                 m = 'Retrying succeeded after {0} attempts'.format(retryCount)
                 print(m)
+            print('radon')
             return [httpHeaderIPFSHash, payloadIPFSHash]
         except NewConnectionError as e:
             print('IPFS daemon is likely not running.')
@@ -69,7 +72,7 @@ def pushToIPFS(hstr, payload):
             attemptCount = '{0}/{1}'.format(retryCount + 1, ipfsRetryCount)
             logError('IPFS failed to add, ' +
                      'retrying attempt {0}'.format(attemptCount))
-            # print(sys.exc_info())
+            print(sys.exc_info())
             retryCount += 1
 
     return None  # Process of adding to IPFS failed
@@ -347,14 +350,18 @@ def pushBytesToIPFS(bytes):
     When IPFS returns a hash, return this to the caller
     """
     global IPFS_API
-
+    print('cc')
     res = IPFS_API.add_bytes(bytes)  # bytes)
+    print('dd')
     # TODO: verify that the add was successful
 
     # Receiving weirdness where res is sometimes a dictionary and sometimes
     #  a unicode string
-    if type(res).__name__ == 'unicode':
+
+    print(type(res).__name__)
+    if type(res).__name__ in (b'unicode', b'str'):
         return res
+    print('ff')
     return res[0]['Hash']
 
 

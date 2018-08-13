@@ -3,14 +3,14 @@ import os
 import argparse
 import string  # For generating a temp file for stdin
 import random  # For generating a temp file for stdin
-from __init__ import __version__ as ipwbVersion
+from .__init__ import __version__ as ipwbVersion
 
 # ipwb modules
-import replay
-import indexer
-import util
+from . import replay
+from . import indexer
+from . import util
 
-from util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
+from .util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
 
 
 def main():

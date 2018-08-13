@@ -1,12 +1,14 @@
 import pytest
 
-import testUtil as ipwbTest
+from . import testUtil as ipwbTest
 from ipwb import replay
 from time import sleep
 
 import requests
 
-import urllib2
+# import urllib2
+from six.moves.urllib.request import urlopen
+from six.moves.urllib.error import HTTPError
 
 # Successful retrieval
 # Accurate retrieval
@@ -113,8 +115,8 @@ def test_unit_commandDaemon():
     replay.commandDaemon('start')
     sleep(10)
     try:
-        urllib2.urlopen('http://localhost:5001')
-    except urllib2.HTTPError, e:
+        urlopen('http://localhost:5001')
+    except HTTPError as e:
         assert e.code == 404
     except Exception as e:
         assert False

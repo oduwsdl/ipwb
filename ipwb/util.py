@@ -9,7 +9,6 @@ import json
 import sys
 import requests
 import ipfsapi
-import exceptions
 import subprocess
 import re
 import site
@@ -19,9 +18,9 @@ import datetime
 import logging
 import platform
 
-import urllib2
+from six.moves.urllib.request import urlopen
 import json
-from __init__ import __version__ as ipwbVersion
+from .__init__ import __version__ as ipwbVersion
 
 # from requests.exceptions import ConnectionError
 from ipfsapi.exceptions import ConnectionError
@@ -49,7 +48,7 @@ def isDaemonAlive(hostAndPort="{0}:{1}".format(IPFSAPI_HOST, IPFSAPI_PORT)):
         # ConnectionError/AttributeError if IPFS daemon not running
         client.id()
         return True
-    except (ConnectionError, exceptions.AttributeError):
+    except (ConnectionError, AttributeError):
         logError("Daemon is not running at http://" + hostAndPort)
         return False
     except OSError:
@@ -268,7 +267,7 @@ def getIPWBReplayIndexPath():
 
 def compareCurrentAndLatestIPWBVersions():
     try:
-        resp = urllib2.urlopen('https://pypi.python.org/pypi/ipwb/json')
+        resp = urlopen('https://pypi.python.org/pypi/ipwb/json')
         jResp = json.loads(resp.read())
         latestVersion = jResp['info']['version']
         currentVersion = re.sub(r'\.0+', '.', ipwbVersion)
