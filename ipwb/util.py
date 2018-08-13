@@ -92,13 +92,6 @@ def sanitizecdxjLine(cdxjLine):
     return cdxjLine
 
 
-# Compare versions of software, <0 if a<b, 0 if ==, >1 if b>a
-def compareVersions(versionA, versionB):
-    def normalize(v):
-        return [int(x) for x in re.sub(r'(\.0+)*$', '', v).split(".")]
-    return cmp(normalize(versionA), normalize(versionB))
-
-
 def isCDXJMetadataRecord(cdxjLine):
     if len(cdxjLine) == 0:
         return False

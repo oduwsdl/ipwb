@@ -103,7 +103,6 @@ def showWebUI(path):
     elif fileExtension == '.css':
         mimeType = 'text/css'
 
-    print(content)
     resp = Response(content, mimetype=mimeType)
     resp.headers['Service-Worker-Allowed'] = '/'
 
@@ -140,8 +139,6 @@ def commandDaemon(cmd):
     elif cmd == 'stop':
         try:
             installedIPFSVersion = IPFS_API.version()['Version']
-            if ipwbUtils.compareVersions(installedIPFSVersion, '0.4.10') < 0:
-                raise UnsupportedIPFSVersions()
             IPFS_API.shutdown()
         except (subprocess.CalledProcessError, UnsupportedIPFSVersions) as e:
             # go-ipfs < 0.4.10
@@ -631,7 +628,6 @@ def show_uri(path, datetime=None):
         print('Unknown exception occurred while fetching from ipfs.')
         print(e)
         abort(500)
-
     if 'encryption_method' in jObj:
         keyString = None
         while keyString is None:
@@ -650,9 +646,8 @@ def show_uri(path, datetime=None):
         header = cipher.decrypt(base64.b64decode(header))
         payload = cipher.decrypt(base64.b64decode(payload))
 
-    hLines = header.split('\n')
+    hLines = header.split(b'\n')
     hLines.pop(0)
-
     status = 200
     if 'status_code' in jObj:
         status = jObj['status_code']
@@ -660,29 +655,29 @@ def show_uri(path, datetime=None):
     resp = Response(payload, status=status)
 
     for idx, hLine in enumerate(hLines):
-        k, v = hLine.split(': ', 1)
-
-        if k.lower() == 'transfer-encoding' and v.lower() == 'chunked':
+        k, v = hLine.split(b': ', 1)
+        if k.lower() == b'transfer-encoding' and v.lower() == b'chunked':
             try:
                 unchunkedPayload = extractResponseFromChunkedData(payload)
             except Exception as e:
+                print('error unchunking')
+                print(e)
                 continue  # Data may have no actually been chunked
             resp.set_data(unchunkedPayload)
 
         if k.lower() not in ["content-type", "content-encoding", "location"]:
-            k = "X-Archive-Orig-" + k
+            k = b"X-Archive-Orig-" + k
 
         resp.headers[k] = v
 
     # Add ipwb header for additional SW logic
     newPayload = resp.get_data()
-    ipwbjsinject = """<script src="/webui/webui.js"></script>
+    ipwbjsinject = b"""<script src="/webui/webui.js"></script>
                       <script>injectIPWBJS()</script>"""
-    newPayload = newPayload.replace('</html>', ipwbjsinject + '</html>')
+    newPayload = newPayload.replace(b'</html>', ipwbjsinject + b'</html>')
     resp.set_data(newPayload)
 
     resp.headers['Memento-Datetime'] = ipwbUtils.digits14ToRFC1123(datetime)
-
     if header is None:
         resp.headers['X-Headers-Generated-By'] = 'InterPlanetary Wayback'
 
@@ -760,18 +755,18 @@ def generateNoMementosInterface(path, datetime):
 
 def extractResponseFromChunkedData(data):
     chunkDescriptor = -1
-    retStr = ''
+    retStr = b''
 
-    (chunkDescriptor, rest) = data.split('\n', 1)
-    chunkDescriptor = chunkDescriptor.split(';')[0].strip()
+    (chunkDescriptor, rest) = data.split(b'\n', 1)
+    chunkDescriptor = chunkDescriptor.split(b';')[0].strip()
 
-    while chunkDescriptor != '0':
+    while chunkDescriptor != b'0':
         # On fail, exception, delta in header vs. payload chunkedness
         chunkDecFromHex = int(chunkDescriptor, 16)  # Get dec for slice
         retStr += rest[:chunkDecFromHex]  # Add to payload
         rest = rest[chunkDecFromHex:]  # Trim from the next chunk onward
-        (CRLF, chunkDescriptor, rest) = rest.split('\n', 2)
-        chunkDescriptor = chunkDescriptor.split(';')[0].strip()
+        (CRLF, chunkDescriptor, rest) = rest.split(b'\n', 2)
+        chunkDescriptor = chunkDescriptor.split(b';')[0].strip()
 
         if len(chunkDescriptor.strip()) == 0:
             break

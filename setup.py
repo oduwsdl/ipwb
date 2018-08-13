@@ -28,7 +28,8 @@ setup(
         'Flask==0.12.2',
         'pycryptodome>=3.4.11',
         'requests>=2.19.1',
-        'six'
+        'six',
+        'surt'
     ],
     tests_require=[
         'flake8>=3.4',
