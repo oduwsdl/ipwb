@@ -1,6 +1,6 @@
 language: python
 python:
-  - "2.7"
+  - "3.7"
 before_script:
   - wget "https://dist.ipfs.io/go-ipfs/v0.4.17/go-ipfs_v0.4.17_linux-amd64.tar.gz" -O /tmp/ipfs.tar.gz
   #- mkdir $HOME/bin
