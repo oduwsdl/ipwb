@@ -84,9 +84,11 @@ def showWebUI(path):
                 iFile = iFileAbs  # Local file
 
         (mCount, uniqueURIRs) = retrieveMemCount(iFile)
+        #mCount = str(mCount)
+        #uniqueURIRs = str(uniqueURIRs)
 
-        content = content.replace(b'MEMCOUNT', bytes(mCount))
-        content = content.replace(b'UNIQUE', bytes(uniqueURIRs))
+        content = content.replace(b'MEMCOUNT', bytes(str(mCount), 'utf-8'))
+        content = content.replace(b'UNIQUE', bytes(str(uniqueURIRs), 'utf-8'))
         content = content.replace(
             b'let uris = []',
             bytes('let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)), 'utf-8'))
@@ -101,6 +103,7 @@ def showWebUI(path):
     elif fileExtension == '.css':
         mimeType = 'text/css'
 
+    print(content)
     resp = Response(content, mimetype=mimeType)
     resp.headers['Service-Worker-Allowed'] = '/'
 
@@ -886,7 +889,7 @@ def getURIsAndDatetimesInCDXJ(cdxjFilePath=INDEX_FILE):
     return json.dumps(uris)
 
 
-def retrieveMemCount(cdxjFilePath=INDEX_FILE):
+def retrieveMemCount(cdxjFilePath=INDEX_FILE) -> (int, int):
     print("Retrieving URI-Ms from {0}".format(cdxjFilePath))
     indexFileContents = getIndexFileContents(cdxjFilePath)
 
