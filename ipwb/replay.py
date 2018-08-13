@@ -85,15 +85,12 @@ def showWebUI(path):
 
         (mCount, uniqueURIRs) = retrieveMemCount(iFile)
 
+        content = content.replace(b'MEMCOUNT', bytes(mCount))
+        content = content.replace(b'UNIQUE', bytes(uniqueURIRs))
         content = content.replace(
-            b'MEMCOUNT', str(mCount))
-        content = content.replace(
-            b'UNIQUE', str(uniqueURIRs))
-
-        content = content.replace(
-            'let uris = []',
-            'let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)))
-        content = content.replace(b'INDEXSRC', iFile)
+            b'let uris = []',
+            bytes('let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)), 'utf-8'))
+        content = content.replace(b'INDEXSRC', bytes(iFile, 'utf-8'))
 
     fileExtension = os.path.splitext(path)[1]
 
@@ -831,11 +828,11 @@ def fetchRemoteCDXJFile(path):
 def getIndexFileContents(cdxjFilePath=INDEX_FILE):
     if not os.path.exists(cdxjFilePath):
         print('File {0} does not exist locally, fetching remote'.format(
-                                                                 cdxjFilePath))
+            cdxjFilePath))
         return fetchRemoteCDXJFile(cdxjFilePath) or ''
 
-    indexFilePath = '/{0}'.format(cdxjFilePath).replace('ipwb.replay', 'ipwb')
-    print('getting index file at {0}'.format(indexFilePath))
+    absPath = os.path.abspath(cdxjFilePath)
+    print('Reading index file at {0}'.format(absPath))
 
     indexFileContent = ''
     with open(cdxjFilePath, 'r') as f:
