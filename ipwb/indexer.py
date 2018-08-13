@@ -56,7 +56,7 @@ def pushToIPFS(hstr, payload):
         try:
             httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr, 'utf-8'))
             print('b')
-            payloadIPFSHash = pushBytesToIPFS(bytes(payload, 'utf-8'))
+            payloadIPFSHash = pushBytesToIPFS(bytes(payload))
             print('c')
             if retryCount > 0:
                 m = 'Retrying succeeded after {0} attempts'.format(retryCount)
@@ -350,18 +350,19 @@ def pushBytesToIPFS(bytes):
     When IPFS returns a hash, return this to the caller
     """
     global IPFS_API
-    print('cc')
+    print('a')
     res = IPFS_API.add_bytes(bytes)  # bytes)
-    print('dd')
+    print('pp')
     # TODO: verify that the add was successful
 
     # Receiving weirdness where res is sometimes a dictionary and sometimes
     #  a unicode string
 
-    print(type(res).__name__)
-    if type(res).__name__ in (b'unicode', b'str'):
+    print(res)
+    if isinstance(type(res).__name__, str):
         return res
     print('ff')
+    print(res)
     return res[0]['Hash']
 
 
