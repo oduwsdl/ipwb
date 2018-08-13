@@ -55,13 +55,12 @@ def pushToIPFS(hstr, payload):
     while retryCount < ipfsRetryCount:
         try:
             httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr, 'utf-8'))
-            print('b')
             payloadIPFSHash = pushBytesToIPFS(bytes(payload))
-            print('c')
+
             if retryCount > 0:
                 m = 'Retrying succeeded after {0} attempts'.format(retryCount)
                 print(m)
-            print('radon')
+
             return [httpHeaderIPFSHash, payloadIPFSHash]
         except NewConnectionError as e:
             print('IPFS daemon is likely not running.')
@@ -350,19 +349,15 @@ def pushBytesToIPFS(bytes):
     When IPFS returns a hash, return this to the caller
     """
     global IPFS_API
-    print('a')
     res = IPFS_API.add_bytes(bytes)  # bytes)
-    print('pp')
     # TODO: verify that the add was successful
 
     # Receiving weirdness where res is sometimes a dictionary and sometimes
     #  a unicode string
 
-    print(res)
     if isinstance(type(res).__name__, str):
         return res
-    print('ff')
-    print(res)
+
     return res[0]['Hash']
 
 
