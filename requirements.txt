@@ -4,3 +4,4 @@ Flask==0.12.2
 pycryptodome>=3.4.11
 requests>=2.19.1
 six
+surt

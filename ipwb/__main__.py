@@ -13,7 +13,7 @@ from . import replay
 from . import indexer
 from . import util
 
-from util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
+from .util import IPFSAPI_HOST, IPFSAPI_PORT, IPWBREPLAY_HOST, IPWBREPLAY_PORT
 
 
 def main():

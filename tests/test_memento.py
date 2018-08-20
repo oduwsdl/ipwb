@@ -1,13 +1,14 @@
 import pytest
 
-import testUtil as ipwbTest
+from . import testUtil as ipwbTest
 from ipwb import replay
 from ipwb import indexer
 from ipwb import __file__ as moduleLocation
 from time import sleep
 import os
 import subprocess
-import urllib2
+# import urllib2
+from six.moves.urllib.request import urlopen
 import random
 import string
 import re
@@ -18,7 +19,7 @@ def getURIMsFromTimeMapInWARC(warcFilename):
     ipwbTest.startReplay(warcFilename)
 
     tmURI = 'http://localhost:5000/timemap/link/memento.us/'
-    tm = urllib2.urlopen(tmURI).read()
+    tm = urlopen(tmURI).read()
 
     urims = []
     for line in tm.split('\n'):
@@ -37,7 +38,7 @@ def getRelsFromURIMSinWARC(warc):
     # Get Link header values for each memento
     linkHeaders = []
     for urim in urims:
-        linkHeaders.append(urllib2.urlopen(urim).info().getheader('Link'))
+        linkHeaders.append(urlopen(urim).info().getheader('Link'))
     ipwbTest.stopReplay()
 
     relsForURIMs = []

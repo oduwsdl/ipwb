@@ -32,7 +32,9 @@ from ipfsapi.exceptions import StatusError as hashNotInIPFS
 from bisect import bisect_left
 from socket import gaierror
 from socket import error as socketerror
-from urlparse import urlsplit, urlunsplit  # N/A in Py3!
+# from urlparse import urlsplit, urlunsplit  # N/A in Py3!
+
+from six.moves.urllib.parse import urlsplit, urlunsplit
 
 from requests import ReadTimeout
 from requests.exceptions impor HTTPError
@@ -49,7 +51,7 @@ from Crypto.Util.Padding import pad
 import base64
 
 from werkzeug.routing import BaseConverter
-from __init__ import __version__ as ipwbVersion
+from .__init__ import __version__ as ipwbVersion
 
 
 from flask import flash, url_for
@@ -135,10 +137,12 @@ def showWebUI(path):
         content = content.replace(
             'UNIQUE', str(uniqueURIRs))
 
+        content = content.replace(b'MEMCOUNT', bytes(str(mCount), 'utf-8'))
+        content = content.replace(b'UNIQUE', bytes(str(uniqueURIRs), 'utf-8'))
         content = content.replace(
-            'let uris = []',
-            'let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)))
-        content = content.replace('INDEXSRC', iFile)
+            b'let uris = []',
+            bytes('let uris = {0}'.format(getURIsAndDatetimesInCDXJ(iFile)), 'utf-8'))
+        content = content.replace(b'INDEXSRC', bytes(iFile, 'utf-8'))
 
     fileExtension = os.path.splitext(path)[1]
 
@@ -182,8 +186,6 @@ def commandDaemon(cmd):
     elif cmd == 'stop':
         try:
             installedIPFSVersion = IPFS_API.version()['Version']
-            if ipwbUtils.compareVersions(installedIPFSVersion, '0.4.10') < 0:
-                raise UnsupportedIPFSVersions()
             IPFS_API.shutdown()
         except (subprocess.CalledProcessError, UnsupportedIPFSVersions) as e:
             if os.name != 'nt':  # Big hammer
@@ -673,7 +675,6 @@ def show_uri(path, datetime=None):
         print('Unknown exception occurred while fetching from ipfs.')
         print(e)
         abort(500)
-
     if 'encryption_method' in jObj:
         keyString = None
         while keyString is None:
@@ -692,9 +693,8 @@ def show_uri(path, datetime=None):
         header = cipher.decrypt(base64.b64decode(header))
         payload = cipher.decrypt(base64.b64decode(payload))
 
-    hLines = header.split('\n')
+    hLines = header.split(b'\n')
     hLines.pop(0)
-
     status = 200
     if 'status_code' in jObj:
         status = jObj['status_code']
@@ -702,29 +702,29 @@ def show_uri(path, datetime=None):
     resp = Response(payload, status=status)
 
     for idx, hLine in enumerate(hLines):
-        k, v = hLine.split(': ', 1)
-
-        if k.lower() == 'transfer-encoding' and v.lower() == 'chunked':
+        k, v = hLine.split(b': ', 1)
+        if k.lower() == b'transfer-encoding' and v.lower() == b'chunked':
             try:
                 unchunkedPayload = extractResponseFromChunkedData(payload)
             except Exception as e:
+                print('error unchunking')
+                print(e)
                 continue  # Data may have no actually been chunked
             resp.set_data(unchunkedPayload)
 
         if k.lower() not in ["content-type", "content-encoding", "location"]:
-            k = "X-Archive-Orig-" + k
+            k = b"X-Archive-Orig-" + k
 
         resp.headers[k] = v
 
     # Add ipwb header for additional SW logic
     newPayload = resp.get_data()
-    ipwbjsinject = """<script src="/webui/webui.js"></script>
+    ipwbjsinject = b"""<script src="/webui/webui.js"></script>
                       <script>injectIPWBJS()</script>"""
-    newPayload = newPayload.replace('</html>', ipwbjsinject + '</html>')
+    newPayload = newPayload.replace(b'</html>', ipwbjsinject + b'</html>')
     resp.set_data(newPayload)
 
     resp.headers['Memento-Datetime'] = ipwbUtils.digits14ToRFC1123(datetime)
-
     if header is None:
         resp.headers['X-Headers-Generated-By'] = 'InterPlanetary Wayback'
 
@@ -802,18 +802,18 @@ def generateNoMementosInterface(path, datetime):
 
 def extractResponseFromChunkedData(data):
     chunkDescriptor = -1
-    retStr = ''
+    retStr = b''
 
-    (chunkDescriptor, rest) = data.split('\n', 1)
-    chunkDescriptor = chunkDescriptor.split(';')[0].strip()
+    (chunkDescriptor, rest) = data.split(b'\n', 1)
+    chunkDescriptor = chunkDescriptor.split(b';')[0].strip()
 
-    while chunkDescriptor != '0':
+    while chunkDescriptor != b'0':
         # On fail, exception, delta in header vs. payload chunkedness
         chunkDecFromHex = int(chunkDescriptor, 16)  # Get dec for slice
         retStr += rest[:chunkDecFromHex]  # Add to payload
         rest = rest[chunkDecFromHex:]  # Trim from the next chunk onward
-        (CRLF, chunkDescriptor, rest) = rest.split('\n', 2)
-        chunkDescriptor = chunkDescriptor.split(';')[0].strip()
+        (CRLF, chunkDescriptor, rest) = rest.split(b'\n', 2)
+        chunkDescriptor = chunkDescriptor.split(b';')[0].strip()
 
         if len(chunkDescriptor.strip()) == 0:
             break
@@ -874,11 +874,11 @@ def fetchRemoteCDXJFile(path):
 def getIndexFileContents(cdxjFilePath=INDEX_FILE):
     if not os.path.exists(cdxjFilePath):
         print('File {0} does not exist locally, fetching remote'.format(
-                                                                 cdxjFilePath))
+            cdxjFilePath))
         return fetchRemoteCDXJFile(cdxjFilePath) or ''
 
-    indexFilePath = '/{0}'.format(cdxjFilePath).replace('ipwb.replay', 'ipwb')
-    print('getting index file at {0}'.format(indexFilePath))
+    absPath = os.path.abspath(cdxjFilePath)
+    print('Reading index file at {0}'.format(absPath))
 
     indexFileContent = ''
     with open(cdxjFilePath, 'r') as f:
@@ -932,7 +932,7 @@ def getURIsAndDatetimesInCDXJ(cdxjFilePath=INDEX_FILE):
     return json.dumps(uris)
 
 
-def retrieveMemCount(cdxjFilePath=INDEX_FILE):
+def retrieveMemCount(cdxjFilePath=INDEX_FILE) -> (int, int):
     print("Retrieving URI-Ms from {0}".format(cdxjFilePath))
     indexFileContents = getIndexFileContents(cdxjFilePath)
 

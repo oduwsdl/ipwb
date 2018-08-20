@@ -30,7 +30,7 @@ from ipfsapi.exceptions import ConnectionError
 
 from six.moves import input
 
-from util import IPFSAPI_HOST, IPFSAPI_PORT
+from .util import IPFSAPI_HOST, IPFSAPI_PORT
 
 # from warcio.archiveiterator import ArchiveIterator
 
@@ -55,11 +55,13 @@ def pushToIPFS(hstr, payload):
     retryCount = 0
     while retryCount < ipfsRetryCount:
         try:
-            httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr))
+            httpHeaderIPFSHash = pushBytesToIPFS(bytes(hstr, 'utf-8'))
             payloadIPFSHash = pushBytesToIPFS(bytes(payload))
+
             if retryCount > 0:
                 m = 'Retrying succeeded after {0} attempts'.format(retryCount)
                 print(m)
+
             return [httpHeaderIPFSHash, payloadIPFSHash]
         except NewConnectionError as e:
             print('IPFS daemon is likely not running.')
@@ -70,7 +72,7 @@ def pushToIPFS(hstr, payload):
             attemptCount = '{0}/{1}'.format(retryCount + 1, ipfsRetryCount)
             logError('IPFS failed to add, ' +
                      'retrying attempt {0}'.format(attemptCount))
-            # print(sys.exc_info())
+            print(sys.exc_info())
             retryCount += 1
 
     return None  # Process of adding to IPFS failed
@@ -352,14 +354,15 @@ def pushBytesToIPFS(bytes):
     When IPFS returns a hash, return this to the caller
     """
     global IPFS_API
-
     res = IPFS_API.add_bytes(bytes)  # bytes)
     # TODO: verify that the add was successful
 
     # Receiving weirdness where res is sometimes a dictionary and sometimes
     #  a unicode string
-    if type(res).__name__ == 'unicode':
+
+    if isinstance(type(res).__name__, str):
         return res
+
     return res[0]['Hash']
 
 

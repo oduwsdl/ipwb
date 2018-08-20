@@ -1,7 +1,7 @@
 # Number of entries in CDXJ == number of response records in WARC
 
 import pytest
-import testUtil as ipwbTest
+from . import testUtil as ipwbTest
 import os
 
 from ipwb import indexer
