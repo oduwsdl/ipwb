@@ -58,6 +58,11 @@ def check_args_replay(args):
         print(f'Proxying to {args.proxy}')
         proxy = args.proxy
 
+    host = replay.IPWBREPLAY_HOST
+    if hasattr(args, 'host') and args.host is not None:
+        print(f'Using custom host {args.host} for replay.')
+        host = args.host
+
     port = replay.IPWBREPLAY_PORT
     if hasattr(args, 'port') and args.port is not None:
         print(f'Using custom port {args.port} for replay.')
@@ -65,7 +70,7 @@ def check_args_replay(args):
 
     # TODO: add any other sub-arguments for replay here
     if supplied_index_parameter:
-        replay.start(cdxj_file_path=args.index, proxy=proxy, port=port)
+        replay.start(cdxj_file_path=args.index, proxy=proxy, host=host, port=port)
     else:
         print('ERROR: An index file must be specified if not piping, e.g.,')
         print(("> ipwb replay "
@@ -143,6 +148,11 @@ def check_args(args_in):
         help='Custom Port',
         type=int,
         default=util.IPWBREPLAY_PORT
+    )
+    replay_parser.add_argument(
+        '-H', '--host',
+        help='Custom Host',
+        default=util.IPWBREPLAY_HOST
     )
     replay_parser.set_defaults(func=check_args_replay,
                                onError=replay_parser.print_help)

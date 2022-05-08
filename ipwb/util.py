@@ -33,7 +33,7 @@ IPFSAPI_MUTLIADDRESS = '/dns/localhost/tcp/5001/http'
 # or '/ip4/{ipaddress}/tcp/{port}/http'
 # or '/ip6/{ipaddress}/tcp/{port}/http
 
-IPWBREPLAY_ADDRESS = 'localhost:2016'
+IPWBREPLAY_ADDRESS = '0.0.0.0:2016'
 
 (IPWBREPLAY_HOST, IPWBREPLAY_PORT) = IPWBREPLAY_ADDRESS.split(':')
 IPWBREPLAY_PORT = int(IPWBREPLAY_PORT)
