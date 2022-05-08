@@ -1067,7 +1067,7 @@ def start(cdxj_file_path, proxy=None, host=IPWBREPLAY_HOST, port=IPWBREPLAY_PORT
         print((f'IPWB replay started on '
                f'http://{host_port[0]}:{host_port[1]}'))
 
-        app.run(host=host_and_port[0], port=host_port[1])
+        app.run(host=host_port[0], port=host_port[1])
     except gaierror:
         print('Detected no active Internet connection.')
         print('Overriding to use default IP and port configuration.')
