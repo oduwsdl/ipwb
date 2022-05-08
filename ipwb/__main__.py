@@ -144,16 +144,17 @@ def check_args(args_in):
         metavar='<host:port>',
         nargs='?')
     replay_parser.add_argument(
+        '-H', '--host',
+        help='Custom Host',
+        default=util.IPWBREPLAY_HOST
+    )
+    replay_parser.add_argument(
         '-p', '--port',
         help='Custom Port',
         type=int,
         default=util.IPWBREPLAY_PORT
     )
-    replay_parser.add_argument(
-        '-H', '--host',
-        help='Custom Host',
-        default=util.IPWBREPLAY_HOST
-    )
+
     replay_parser.set_defaults(func=check_args_replay,
                                onError=replay_parser.print_help)
 
