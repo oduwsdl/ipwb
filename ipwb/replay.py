@@ -1073,7 +1073,7 @@ def start(cdxj_file_path, proxy=None, host=IPWBREPLAY_HOST, port=IPWBREPLAY_PORT
         print('Overriding to use default IP and port configuration.')
         app.run()
     except socketerror:
-        print(f'Address {IPWBREPLAY_HOST}:{IPWBREPLAY_PORT} already in use!')
+        print(f'Address {host_port[0]}:{host_port[1]} already in use!')
         sys.exit()
 
 
