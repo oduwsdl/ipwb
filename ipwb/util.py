@@ -354,7 +354,7 @@ def get_warc_paths_in_wacz(wacz_path):
         return [w for w in z.namelist() if w.startswith('archive/')]
 
 
-def extract_warcs_to_disk(wac_paths):
+def extract_warcs_to_disk(warc_paths):
     for warc in warc_paths:
         with ZipFile(sample_wacz) as z:
             z.extract(warc)
