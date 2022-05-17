@@ -354,14 +354,14 @@ def get_warc_paths_in_wacz(wacz_path):
         return [w for w in z.namelist() if w.startswith('archive/')]
 
 
-def extract_warcs_to_disk(warc_paths):
+def extract_warcs_to_disk(wacz_path, warc_paths):
     for warc in warc_paths:
-        with ZipFile(warc) as z:
+        with ZipFile(wacz_path) as z:
             z.extract(warc)
 
 
 def extract_warcs_from_wacz(wacz_path):
     warc_paths = get_warc_paths_in_wacz(wacz_path)
-    extract_warcs_to_disk(warc_paths)
+    extract_warcs_to_disk(wacz_path, warc_paths)
 
     return glob.glob('archive/*')

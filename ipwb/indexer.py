@@ -128,13 +128,13 @@ def index_file_at(warc_paths, encryption_key=None,
     warc_paths_to_remove = []
     for warc_path in warc_paths:
         if is_wacz(warc_path):
-            warc_paths_to_append.append(
-                extract_warcs_from_wacz(warc_path))
+            warc_paths_to_append += extract_warcs_from_wacz(warc_path)
             warc_paths_to_remove.append(warc_path)
 
     # Manipulate list of WARCs extracted from WACZ
-    warc_paths.remove(warc_paths_to_remove)
-    warc_paths += warc_paths_to_append
+    for ptr in warc_paths_to_remove:
+        warc_paths.remove(ptr)
+    warc_paths = warc_paths + warc_paths_to_append
 
     cdxj_lines = []
 
