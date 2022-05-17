@@ -33,6 +33,7 @@ from six import PY2
 from six import PY3
 
 from ipwb.util import iso8601_to_digits14, ipfs_client
+from ipwb.util import is_wacz, extract_warcs_from_wacz
 
 import requests
 import datetime
@@ -122,6 +123,18 @@ def index_file_at(warc_paths, encryption_key=None,
 
     for warc_path in warc_paths:
         verify_file_exists(warc_path)
+
+    warc_paths_to_append = []
+    warc_paths_to_remove = []
+    for warc_path in warc_paths:
+        if is_wacz(warc_path):
+            warc_paths_to_append.append(
+                extract_warcs_from_wacz(warc_path))
+            warc_paths_to_remove.append(warc_path)
+
+    # Manipulate list of WARCs extracted from WACZ
+    warc_paths.remove(warc_paths_to_remove)
+    warc_paths += warc_paths_to_append
 
     cdxj_lines = []
 

@@ -13,6 +13,10 @@ import datetime
 import logging
 import platform
 
+# For extracting WARCs from WACZ
+import glob
+from zipfile import ZipFile, is_zipfile
+
 from urllib.request import urlopen
 from urllib.error import URLError
 
@@ -336,3 +340,28 @@ def check_for_update(_):
         print("The installed version of ipwb is outdated.")
         print(f"* Installed: {current}\n* Latest:    {latest}")
         print("Please run `pip install --upgrade ipwb` to upgrade.")
+
+
+def is_wacz(path):
+    # TODO: add logic to check if wacz
+    # the py-wacz validator inherits many dependencies,
+    # so ad hoc here for now
+    return is_zipfile(path)
+
+
+def get_warc_paths_in_wacz(wacz_path):
+    with ZipFile(wacz_path) as z:
+        return [w for w in z.namelist() if w.startswith('archive/')]
+
+
+def extract_warcs_to_disk(wac_paths):
+    for warc in warc_paths:
+        with ZipFile(sample_wacz) as z:
+            z.extract(warc)
+
+
+def extract_warcs_from_wacz(wacz_path):
+    warc_paths = get_warc_paths_in_wacz(wacz_path)
+    extract_warcs_to_disk(warc_paths)
+
+    return glob.glob('archive/*')
