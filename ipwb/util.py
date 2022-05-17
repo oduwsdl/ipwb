@@ -356,7 +356,7 @@ def get_warc_paths_in_wacz(wacz_path):
 
 def extract_warcs_to_disk(warc_paths):
     for warc in warc_paths:
-        with ZipFile(sample_wacz) as z:
+        with ZipFile(warc) as z:
             z.extract(warc)
 
 
