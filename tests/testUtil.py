@@ -57,7 +57,7 @@ def count_cdxj_entries(cdxj_data):
     return urim_count
 
 
-def start_replay(filename, samples_dir='warc'):
+def start_replay(filename, samples_dir='warcs'):
     global p
     if filename.endswith('.wacz'):
         samples_dir = 'wacz'
