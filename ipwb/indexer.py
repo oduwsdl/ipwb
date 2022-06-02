@@ -125,17 +125,16 @@ def index_file_at(warc_paths, encryption_key=None,
     for warc_path in warc_paths:
         verify_file_exists(warc_path)
 
+    # Extract WARCs from any WACZ files
     warc_paths_to_append = []
-    warc_paths_to_remove = []
-    warcs_to_cleanup_post_indexing = []
+    wacz_paths = []
     for warc_path in warc_paths:
         if is_wacz(warc_path):
             warc_paths_to_append += extract_warcs_from_wacz(warc_path)
-            warcs_to_cleanup_post_indexing = warc_paths_to_append
-            warc_paths_to_remove.append(warc_path)
+            wacz_paths.append(warc_path)
 
     # Manipulate list of WARCs extracted from WACZ
-    for ptr in warc_paths_to_remove:
+    for ptr in wacz_paths:
         warc_paths.remove(ptr)
     warc_paths = warc_paths + warc_paths_to_append
 
@@ -187,7 +186,7 @@ def index_file_at(warc_paths, encryption_key=None,
     cdxj_metadata_lines = generate_cdxj_metadata(cdxj_lines)
     cdxj_lines = cdxj_metadata_lines + cdxj_lines
 
-    cleanup_warc_files_extracted_from_wacz(warcs_to_cleanup_post_indexing)
+    cleanup_warc_files_extracted_from_wacz(warc_paths_to_append)
 
     if quiet:
         return cdxj_lines

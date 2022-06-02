@@ -12,6 +12,7 @@ import locale
 import datetime
 import logging
 import platform
+import tempfile
 
 # For extracting WARCs from WACZ
 import glob
@@ -354,24 +355,28 @@ def get_warc_paths_in_wacz(wacz_path):
         return [w for w in z.namelist() if w.startswith('archive/')]
 
 
-def extract_warcs_to_disk(wacz_path, warc_paths):
+def extract_warcs_to_disk(wacz_path, warc_paths) -> list:
+    extracted_warc_paths = []
     for warc in warc_paths:
         with ZipFile(wacz_path) as z:
-            z.extract(warc)
+            ph = z.extract(warc, tempfile.mkdtemp())
+            extracted_warc_paths.append(ph)
+
+    return extracted_warc_paths
 
 
 def extract_warcs_from_wacz(wacz_path):
-    warc_paths = get_warc_paths_in_wacz(wacz_path)
-    extract_warcs_to_disk(wacz_path, warc_paths)
+    warc_paths_in_wacz = get_warc_paths_in_wacz(wacz_path)
+    warc_paths_on_disk = extract_warcs_to_disk(
+        wacz_path, warc_paths_in_wacz)
 
-    return glob.glob('archive/*')
+    return warc_paths_on_disk
 
 
 def cleanup_warc_files_extracted_from_wacz(warc_paths):
     for temporary_warc in warc_paths:
         try:
             if os.path.isfile(temporary_warc):
-                print(f'Deleting tempporary WARC at {temporary_warc}')
                 os.remove(temporary_warc)
         except OSError as e:
             print(f'Error: {e.filename}, {e.strerror}')
