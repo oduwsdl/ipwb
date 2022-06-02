@@ -365,3 +365,13 @@ def extract_warcs_from_wacz(wacz_path):
     extract_warcs_to_disk(wacz_path, warc_paths)
 
     return glob.glob('archive/*')
+
+
+def cleanup_warc_files_extracted_from_wacz(warc_paths):
+    for temporary_warc in warc_paths:
+        try:
+            if os.path.isfile(temporary_warc):
+                print(f'Deleting tempporary WARC at {temporary_warc}')
+                os.remove(temporary_warc)
+        except OSError as e:
+            print(f'Error: {e.filename}, {e.strerror}')

@@ -34,6 +34,7 @@ from six import PY3
 
 from ipwb.util import iso8601_to_digits14, ipfs_client
 from ipwb.util import is_wacz, extract_warcs_from_wacz
+from ipwb.util import cleanup_warc_files_extracted_from_wacz
 
 import requests
 import datetime
@@ -126,9 +127,11 @@ def index_file_at(warc_paths, encryption_key=None,
 
     warc_paths_to_append = []
     warc_paths_to_remove = []
+    warcs_to_cleanup_post_indexing = []
     for warc_path in warc_paths:
         if is_wacz(warc_path):
             warc_paths_to_append += extract_warcs_from_wacz(warc_path)
+            warcs_to_cleanup_post_indexing = warc_paths_to_append
             warc_paths_to_remove.append(warc_path)
 
     # Manipulate list of WARCs extracted from WACZ
@@ -183,6 +186,8 @@ def index_file_at(warc_paths, encryption_key=None,
     # Prepend metadata
     cdxj_metadata_lines = generate_cdxj_metadata(cdxj_lines)
     cdxj_lines = cdxj_metadata_lines + cdxj_lines
+
+    cleanup_warc_files_extracted_from_wacz(warcs_to_cleanup_post_indexing)
 
     if quiet:
         return cdxj_lines
