@@ -356,21 +356,28 @@ def get_warc_paths_in_wacz(wacz_path):
 
 
 def extract_warcs_to_disk(wacz_path, warc_paths) -> list:
+    '''
+    Extract WARCs and retain reference to temp path
+    for later deletion
+    '''
     extracted_warc_paths = []
+    tmp_dirs = []
     for warc in warc_paths:
         with ZipFile(wacz_path) as z:
-            ph = z.extract(warc, tempfile.mkdtemp())
+            tmp_dir = tempfile.mkdtemp()
+            ph = z.extract(warc, tmp_dir)
             extracted_warc_paths.append(ph)
+            tmp_dirs.append(tmp_dir)  # For later dir deletion
 
-    return extracted_warc_paths
+    return (extracted_warc_paths, tmp_dirs)
 
 
 def extract_warcs_from_wacz(wacz_path):
     warc_paths_in_wacz = get_warc_paths_in_wacz(wacz_path)
-    warc_paths_on_disk = extract_warcs_to_disk(
+    (warc_paths_on_disk, dirs_to_cleanup) = extract_warcs_to_disk(
         wacz_path, warc_paths_in_wacz)
 
-    return warc_paths_on_disk
+    return (warc_paths_on_disk, dirs_to_cleanup)
 
 
 def cleanup_warc_files_extracted_from_wacz(warc_paths):

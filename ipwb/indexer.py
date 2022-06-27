@@ -17,6 +17,7 @@ import ipfshttpclient as ipfsapi
 import zlib
 import surt
 import ntpath
+import shutil
 import traceback
 import tempfile
 
@@ -130,12 +131,14 @@ def index_file_at(warc_paths, encryption_key=None,
     wacz_paths = []
     for warc_path in warc_paths:
         if is_wacz(warc_path):
-            warc_paths_to_append += extract_warcs_from_wacz(warc_path)
+            (new_warc_paths, dirs_to_cleanup) = extract_warcs_from_wacz(warc_path)
+            warc_paths_to_append += new_warc_paths
             wacz_paths.append(warc_path)
 
     # Manipulate list of WARCs extracted from WACZ
     for ptr in wacz_paths:
         warc_paths.remove(ptr)
+
     warc_paths = warc_paths + warc_paths_to_append
 
     cdxj_lines = []
@@ -200,6 +203,10 @@ def index_file_at(warc_paths, encryption_key=None,
         output_file.close()
     else:
         print('\n'.join(cdxj_lines))
+
+    # Cleanup, e.g., dirs for WARCs from WACZ
+    for dir_to_cleanup in dirs_to_cleanup:
+        shutil.rmtree(dir_to_cleanup)
 
 
 def sanitize_cdxj_line(cdxj_line):
