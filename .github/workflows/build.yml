@@ -16,7 +16,7 @@ jobs:
       - id: imgtagger
         run: |
           imgtags=$(echo "${{ github.ref }}" | sed 's/refs\/tags\//latest,/; s/refs\/heads\///')
-          echo "::set-output name=imgtags::$imgtags"
+          echo "{imgtags}={$imgtags}" >> $GITHUB_OUTPUT
       - name: Build and Push to DockerHub
         uses: docker/build-push-action@v2
         with:
