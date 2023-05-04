@@ -16,7 +16,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up IPFS and Rub Daemon
-      uses: ibnesayeed/setup-ipfs@master
+      uses: machawk1/setup-ipfs@main
       with:
         run_daemon: true
     - name: Set up Python

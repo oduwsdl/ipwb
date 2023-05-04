@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - name: Set up IPFS ${{ matrix.ipfs }}
-        uses: ibnesayeed/setup-ipfs@master
+        uses: machawk1/setup-ipfs@main
         with:
           ipfs_version: ${{ matrix.ipfs }}
           run_daemon: true
