@@ -16,6 +16,7 @@ setup(
     author_email='me@matkelly.com',
     description=desc,
     packages=['ipwb'],
+    python_requires='>=3.8',
     license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -25,7 +26,7 @@ setup(
     install_requires=[
         'warcio>=1.5.3',
         'ipfshttpclient>=0.8.0a',
-        'Flask==2.0.3',
+        'Flask==2.3.2',
         'pycryptodome>=3.4.11',
         'requests>=2.19.1',
         'beautifulsoup4>=4.6.3',
@@ -56,7 +57,6 @@ setup(
 
         'Environment :: Web Environment',
 
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',

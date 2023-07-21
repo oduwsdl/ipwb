@@ -21,7 +21,7 @@ RUN        mkdir -p /data/{warc,cdxj,ipfs}
 
 # Download and install IPFS
 ENV        IPFS_PATH=/data/ipfs
-ARG        IPFS_VERSION=v0.18.0
+ARG        IPFS_VERSION=v0.21.0
 RUN        cd /tmp \
            && wget -q https://dist.ipfs.io/kubo/${IPFS_VERSION}/kubo_${IPFS_VERSION}_linux-amd64.tar.gz \
            && tar xvfz kubo*.tar.gz \

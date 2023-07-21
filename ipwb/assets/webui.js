@@ -293,8 +293,6 @@ function registerServiceWorker () {
 }
 
 function localizeNumber (numberIn) {
-  console.log('localizing ')
-  console.log(numberIn)
   let clientLocale = navigator.language
   if (navigator.languages && navigator.languages.length) {
     clientLocale = navigator.languages[0]
@@ -302,7 +300,20 @@ function localizeNumber (numberIn) {
   return new Intl.NumberFormat(clientLocale).format(numberIn)
 }
 
+function setDaemonVersion () {
+  const daemonVersion = document.querySelector('#daemonVersion')
+
+  window.fetch('/ipfsdaemon/version')
+    .then((response) => response.text())
+    .then((txt) => (daemonVersion.innerHTML = txt))
+}
+
 window.addEventListener('DOMContentLoaded', (event) => {
   const memCount = document.querySelector('#memCountInt')
-  memCount.textContent = localizeNumber(memCount.textContent)
+  if (!memCount) {
+    return // JS file called from two contexts
+  }
+  memCount.innerHTML = localizeNumber(memCount.innerHTML)
+
+  document.querySelector('#daemonStatus').addEventListener('load', () => { setDaemonVersion() })
 })
