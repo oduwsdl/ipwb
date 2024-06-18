@@ -29,10 +29,6 @@ from requests.packages.urllib3.exceptions import NewConnectionError
 from ipfshttpclient.exceptions import ConnectionError
 # from requests.exceptions import ConnectionError
 
-from six.moves import input
-from six import PY2
-from six import PY3
-
 from ipwb.util import iso8601_to_digits14, ipfs_client
 from ipwb.util import is_wacz, extract_warcs_from_wacz
 from ipwb.util import cleanup_warc_files_extracted_from_wacz
@@ -52,7 +48,7 @@ DEBUG = False
 
 
 def s2b(s):  # Convert str to bytes, cross-py
-    return bytes(s) if PY2 else bytes(s, 'utf-8')
+    return bytes(s, 'utf-8')
 
 
 # TODO: put this method definition below index_file_at()

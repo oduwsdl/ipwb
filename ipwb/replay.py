@@ -28,10 +28,11 @@ from bisect import bisect_left
 from socket import gaierror
 from socket import error as socketerror
 
-from six.moves.urllib_parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 
 from requests.exceptions import HTTPError
+from ipfshttpclient.exceptions import ConnectionError
 
 from . import util as ipwb_utils
 from .backends import get_web_archive_index
@@ -39,6 +40,7 @@ from .exceptions import IPFSDaemonNotAvailable
 from .util import unsurt, ipfs_client
 from .util import IPWBREPLAY_HOST, IPWBREPLAY_PORT
 from .util import INDEX_FILE
+from .util import MementoMatch
 
 from . import indexer
 
@@ -50,6 +52,7 @@ import base64
 
 from werkzeug.routing import BaseConverter
 from .__init__ import __version__ as ipwb_version
+from . import settings
 
 
 from flask import flash
@@ -134,18 +137,23 @@ class UnsupportedIPFSVersions(Exception):
 
 @app.route('/ipfsdaemon/<cmd>')
 def command_daemon(cmd):
+    local_daemon = ipwb_utils.is_localhosty(settings.App.config("ipfsapi"))
+
     if cmd == 'status':
         return generate_daemon_status_button()
-    elif cmd == 'start':
+    elif cmd == 'version':
+        return request_daemon_version_via_http()
+    elif cmd == 'start' and local_daemon:
         subprocess.Popen(['ipfs', 'daemon'])
         return Response('IPFS daemon starting...')
 
-    elif cmd == 'stop':
+    elif cmd == 'stop' and local_daemon:
         try:
             ipfs_version = ipfs_client().version()['Version']
             if ipwb_utils.compare_versions(ipfs_version, '0.4.10') < 0:
                 raise UnsupportedIPFSVersions()
-            ipfs_client().shutdown()
+
+            ipfs_client().close()
         except (subprocess.CalledProcessError, UnsupportedIPFSVersions) as _:
             if os.name != 'nt':  # Big hammer
                 subprocess.call(['killall', 'ipfs'])
@@ -168,6 +176,103 @@ def show_mementos_for_urirs_sans_js():
         return Response('Searching for nothing is not allowed!', status=400)
 
     return redirect(f'/memento/*/{urir}', code=301)
+
+
+def bin_search(iter, key, datetime=None):
+    # Skip metadata lines
+    while iter.peek(1)[:1] == b'!':
+        iter.readline()
+
+    # Set the beginning position to the start of the first data line
+    left = iter.tell()
+    # Go to end of seek stream
+    iter.seek(0, 2)
+    right = iter.tell()  # Current position
+
+    lines = set()  # Prevents dupes
+    key = key.rstrip(b"/")
+
+    while (right - left > 1):
+        mid = (right + left) // 2
+        iter.seek(mid)
+        iter.readline()  # Purge rest of current line
+        line = iter.readline()  # Read the next full line
+
+        if len(line) == 0:
+            right = mid
+            continue
+
+        try:
+            surtk, datetimeK, rest = line.split(maxsplit=2)
+        except ValueError as e:
+            continue
+
+        surtk = surtk.rstrip(b"/")
+
+        match_degree = get_match_degree(key, datetime, surtk, datetimeK)
+
+        if match_degree == MementoMatch.RIGHTKEYWRONGDATE:
+            lines.add(line)
+            # Iterate further to get lines after selection point
+            next_line = iter.readline()
+            while next_line:
+                surtk, datetimeK, rest = next_line.split(maxsplit=2)
+                surtk = surtk.rstrip(b"/")
+
+                match_degree = get_match_degree(key, datetime, surtk, datetimeK)
+                if match_degree == MementoMatch.RIGHTKEYWRONGDATE:
+                    lines.add(next_line)
+                elif match_degree == MementoMatch.EXACTMATCH:
+                    # Exact match found while iterating
+                    return [next_line]
+                elif match_degree == MementoMatch.WRONGKEY:
+                    # Matched keys exhausted
+                    break
+
+                next_line = iter.readline()
+
+            # Continue searching until find first instance
+            right = mid
+        elif match_degree == MementoMatch.EXACTMATCH:
+            return [line]
+        elif key > surtk:
+            left = mid
+        else:
+            right = mid
+
+    # Convert uniq set to list then sort and return
+    ret = sorted(list(lines))
+
+    return ret
+
+
+def get_match_degree(surt, datetime, surtK, datetimeK):
+    if surt == surtK:
+        datetimeK = datetimeK.decode()
+        if datetime is None or datetime is not None and datetime != datetimeK:
+            return MementoMatch.RIGHTKEYWRONGDATE
+        if datetime == datetimeK:
+            return MementoMatch.EXACTMATCH
+    else:
+        return MementoMatch.WRONGKEY
+
+
+def getCDXJLinesWithURIR(urir, index_path, datetime=None):
+    """ Get all CDXJ records corresponding to a URI-R """
+    if not index_path:
+        index_path = ipwb_utils.get_ipwb_replay_index_path()
+    index_path = get_index_file_full_path(index_path)
+
+    # Convert URI-R to surt
+    surtedURIR = surt.surt(urir, path_strip_trailing_slash_unless_empty=True)
+
+    fobj = open(index_path, "rb")
+    res = bin_search(fobj, surtedURIR.encode(), datetime)
+    fobj.close()
+
+    if res is not None:
+        return res
+    return []
 
 
 @app.route('/memento/*/<path:urir>')
@@ -231,6 +336,8 @@ def resolve_memento(urir, datetime):
         msg += f'<p>No captures found for {urir} at {datetime}.</p>'
 
         return Response(msg, status=404)
+    # else:  # If there is a byte string, conv to reg string for splitting
+    #    closest_line = closest_line.decode()
 
     uri = unsurt(closest_line.split(' ')[0])
     new_datetime = closest_line.split(' ')[1]
@@ -258,11 +365,13 @@ def show_memento(urir, datetime):
     except ValueError as _:
         msg = f'Expected a 4-14 digits valid datetime: {datetime}'
         return Response(msg, status=400)
+
     resolved_memento = resolve_memento(urir, datetime)
 
     # resolved to a 404, flask Response object returned instead of tuple
     if isinstance(resolved_memento, Response):
         return resolved_memento
+
     (new_datetime, link_header, uri) = resolved_memento
 
     if new_datetime != datetime:
@@ -552,7 +661,7 @@ def all_exception_handler(error):
 @app.route('/ipwbadmin', strict_slashes=False)
 def show_admin():
     status = {'ipwb_version': ipwb_version,
-              'ipfs_endpoint': ipwb_utils.IPFSAPI_MUTLIADDRESS}
+              'ipfs_endpoint': settings.App.config("ipfsapi")}
     index_file = ipwb_utils.get_ipwb_replay_index_path()
 
     memento_info = calculate_memento_info_in_index(index_file)
@@ -601,7 +710,7 @@ def show_landing_page():
 
 def show_uri(path, datetime=None):
     try:
-        ipwb_utils.check_daemon_is_alive(ipwb_utils.IPFSAPI_MUTLIADDRESS)
+        ipwb_utils.check_daemon_is_alive()
 
     except IPFSDaemonNotAvailable:
         err_str = ('IPFS daemon not running. '
@@ -625,6 +734,7 @@ def show_uri(path, datetime=None):
 
     except Exception as _:
         print(sys.exc_info()[0])
+
         resp_string = (
             f'{path} not found :('
             f' <a href="http://{IPWBREPLAY_HOST}:{IPWBREPLAY_PORT}">'
@@ -683,6 +793,7 @@ def show_uri(path, datetime=None):
     except Exception as e:
         print('Unknown exception occurred while fetching from ipfs.')
         print(e)
+        print(sys.exc_info()[0])
         return "An unknown exception occurred", 500
 
     if 'encryption_method' in json_object:
@@ -855,6 +966,19 @@ def extract_response_from_chunked_data(data):
     return ret_str
 
 
+def request_daemon_version_via_http():
+    try:
+        ipfs_version = ipfs_client().version()['Version']
+        status = 200
+    except ConnectionError as _:
+        ipfs_version = 'Not Available'
+        status = 503
+
+    return Response(response=ipfs_version,
+                    status=status,
+                    mimetype='text/plain')
+
+
 def generate_daemon_status_button():
     text = 'Not Running'
     button_text = 'Start'
@@ -869,7 +993,7 @@ def generate_daemon_status_button():
         text = 'Running'
         button_text = 'Stop'
 
-    status_page_html = f'<html id="status{button_text}" class="status">'
+    status_page_html = f'<!DOCTYPE html><html id="status{button_text}" class="status">'
     status_page_html += ('<head><base href="/ipwbassets/" />'
                          '<link rel="stylesheet" type="text/css" '
                          'href="webui.css" />'
@@ -880,6 +1004,7 @@ def generate_daemon_status_button():
     button_html += f'<button id="daeAction">{button_text}</button>'
 
     footer = '<script>assignStatusButtonHandlers()</script></body></html>'
+
     return Response(f'{status_page_html}{button_html}{footer}')
 
 

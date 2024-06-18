@@ -26,6 +26,7 @@ def get_urims_from_timemap_in_warc(warcFilename):
         is_a_memento = len(re.findall('rel=".*memento"', line)) > 0
         if is_a_memento:
             urims.append(re.findall('<(.*)>', line)[0])
+
     ipwb_test.stop_replay()
 
     return urims

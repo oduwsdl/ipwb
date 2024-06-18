@@ -10,12 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     name: Py and JS
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Lint JavaScript
         run: |
           npm install standard
           node_modules/.bin/standard
+      - name: Clean up standard.js artifacts
+        shell: bash
+        run: |
+          rm -rf node_modules
+          rm package-lock.json
+          rm package.json
       - name: Lint Python
         run: |
           pip install --user pycodestyle
-          python -m pycodestyle
+          python -m pycodestyle --max-line-length=88

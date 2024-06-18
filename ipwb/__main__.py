@@ -5,10 +5,12 @@ import random  # For generating a temp file for stdin
 import sys
 import tempfile
 
+from multiaddr import Multiaddr
+from multiaddr import exceptions as multiaddr_exceptions
 # ipwb modules
 from ipwb import settings, replay, indexer, util
 from ipwb.error_handler import exception_logger
-from .__init__ import __version__ as ipwb_version
+from ipwb.__init__ import __version__ as ipwb_version
 
 
 @exception_logger(catch=not settings.DEBUG)
@@ -17,6 +19,15 @@ def main():
 
 
 def check_args_index(args):
+    # args.daemon_address is always set. Either default or by CLI
+    try:
+        # see if it parses
+        daemon = Multiaddr(args.daemon_address)
+    except multiaddr_exceptions.StringParseError as e:
+        print("Daemon address cannot be parsed")
+        raise e
+    settings.App.set("ipfsapi", str(daemon))
+
     util.check_daemon_is_alive()
 
     enc_key = None
@@ -57,6 +68,13 @@ def check_args_replay(args):
     if hasattr(args, 'proxy') and args.proxy is not None:
         print(f'Proxying to {args.proxy}')
         proxy = args.proxy
+    try:
+        # see if it parses
+        daemon = Multiaddr(args.daemon_address)
+    except multiaddr_exceptions.StringParseError as e:
+        print("Daemon address cannot be parsed")
+        raise e
+    settings.App.set("ipfsapi", str(daemon))
 
     port = replay.IPWBREPLAY_PORT
     if hasattr(args, 'port') and args.port is not None:
@@ -151,7 +169,7 @@ def check_args(args_in):
         '-d', '--daemon',
         help=("Multi-address of IPFS daemon "
               "(default /dns/localhost/tcp/5001/http)"),
-        default=util.IPFSAPI_MUTLIADDRESS,
+        default=settings.App.config("ipfsapi"),
         dest='daemon_address')
     parser.add_argument(
         '-v', '--version', help='Report the version of ipwb', action='version',
