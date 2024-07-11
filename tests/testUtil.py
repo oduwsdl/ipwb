@@ -57,11 +57,14 @@ def count_cdxj_entries(cdxj_data):
     return urim_count
 
 
-def start_replay(warc_filename):
+def start_replay(filename, samples_dir='warcs'):
     global p
+    if filename.endswith('.wacz'):
+        samples_dir = 'wacz'
+
     path_of_warc = os.path.join(
         Path(os.path.dirname(__file__)).parent,
-        'samples', 'warcs', warc_filename)
+        'samples', samples_dir, filename)
 
     fh, tempfile_path = tempfile.mkstemp(suffix='.cdxj')
     os.close(fh)
