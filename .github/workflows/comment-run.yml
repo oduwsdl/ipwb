@@ -12,15 +12,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code (Deep)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Set up IPFS and Rub Daemon
-      uses: ibnesayeed/setup-ipfs@master
+      uses: oduwsdl/setup-ipfs@main
       with:
         run_daemon: true
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
     - name: Install Test Dependencies
       run: pip install -r test-requirements.txt
     - name: Install IPWB from Source
