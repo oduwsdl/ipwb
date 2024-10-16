@@ -16,7 +16,7 @@ setup(
     author_email='me@matkelly.com',
     description=desc,
     packages=['ipwb'],
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -30,7 +30,9 @@ setup(
         'pycryptodome>=3.4.11',
         'requests>=2.19.1',
         'beautifulsoup4>=4.6.3',
-        'surt>=0.3.0'
+        'surt>=0.3.0',
+        'multiaddr>=0.0.9',
+        'packaging==23.0'
     ],
     tests_require=[
         'flake8>=3.4',
@@ -56,10 +58,11 @@ setup(
 
         'Environment :: Web Environment',
 
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
 
         'License :: OSI Approved :: MIT License',
 

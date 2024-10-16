@@ -23,7 +23,7 @@ Another important feature of archival replays is the inclusion of an archival ba
 
 ## Installing
 
-InterPlanetary Wayback (ipwb) requires Python 3.8+. ipwb can also be used with Docker ([see below](#user-content-using-docker)).
+InterPlanetary Wayback (ipwb) requires Python 3.9+. ipwb can also be used with Docker ([see below](#user-content-using-docker)).
 
 For conventional usage, the latest release of ipwb can be installed using pip:
 
