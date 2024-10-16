@@ -15,15 +15,14 @@ jobs:
           - macos-latest
           # - windows-latest
         python:
-          - "3.8"
           - "3.9"
           - "3.10"
           - "3.11"
+          - "3.12"
         ipfs:
-          - "0.26"
-          - "0.27"
           - "0.28"
           - "0.29"
+          - "0.30"
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} Py-${{ matrix.python }} IPFS-${{ matrix.ipfs }}
     steps:
@@ -40,6 +39,7 @@ jobs:
       - name: Install Python Dependencies
         shell: bash
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r test-requirements.txt
       - name: Run Tests

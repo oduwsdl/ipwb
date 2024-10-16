@@ -21,7 +21,7 @@ RUN        mkdir -p /data/{warc,cdxj,ipfs}
 
 # Download and install IPFS
 ENV        IPFS_PATH=/data/ipfs
-ARG        IPFS_VERSION=v0.29.0
+ARG        IPFS_VERSION=v0.30.0
 ARG        BUILDARCH
 RUN        cd /tmp \
            && wget -q https://dist.ipfs.io/kubo/${IPFS_VERSION}/kubo_${IPFS_VERSION}_linux-$BUILDARCH.tar.gz \

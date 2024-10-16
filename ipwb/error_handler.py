@@ -7,7 +7,7 @@ logger = logging.getLogger('ipwb')
 
 def exception_logger(catch=True, exception_class=Exception):
     """
-    Decorator which catches exceptions in the function and logs them.
+    Decorator that catches exceptions in the function and logs them.
 
     Usage:
 
@@ -17,11 +17,11 @@ def exception_logger(catch=True, exception_class=Exception):
         do_something
     ```
 
-    `exception_logger()` will catch any exception which happens in
+    `exception_logger()` will catch any exception that happens in
     `decorated_function()` while it is being executed, and log an error using
     Python built in `logging` library.
 
-    Unless `catch` argument is `False` - in which case the exception will be
+    Unless `catch` argument is `False` - in which case, the exception will be
     reraised.
     """
     def decorator(f: Callable):

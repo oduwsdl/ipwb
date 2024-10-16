@@ -11,10 +11,10 @@ navigating their captures.
 
 import sys
 import os
+import importlib.resources
 import ipfshttpclient as ipfsapi
 import json
 import subprocess
-import pkg_resources
 import surt
 import re
 import traceback
@@ -1018,8 +1018,8 @@ def get_index_file_full_path(cdxj_file_path=INDEX_FILE):
     if os.path.isfile(cdxj_file_path):
         return cdxj_file_path
 
-    index_file_name = pkg_resources.resource_filename(
-        __name__, index_file_path)
+    index_file_name = importlib.resources.files(
+        __name__).joinpath(index_file_path)
     return index_file_name
 
 

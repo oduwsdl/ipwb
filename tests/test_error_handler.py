@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
 
 from ipwb.error_handler import exception_logger
 
@@ -24,4 +24,4 @@ def test_catch():
     with patch('ipwb.error_handler.logger.critical', mock_logger):
         caught_error('boo')
 
-    assert mock_logger.called_once_with(('boo', ))
+    mock_logger.assert_called_once_with('boo')
