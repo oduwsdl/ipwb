@@ -68,6 +68,8 @@ class ReconstructiveBanner extends HTMLElement {
 
     this.nextDatetime = this.getAttribute('next-datetime') || '';
 
+    this.timemapUrit = this.getAttribute('timemap-urit') || '';
+
     this.autoHideDelay = 2000;
 
     this.displayDatetime = (() => {
