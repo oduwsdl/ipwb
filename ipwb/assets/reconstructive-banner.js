@@ -293,6 +293,7 @@ class ReconstructiveBanner extends HTMLElement {
             <!-- TODO: Add provenance infomration, metadata, and interactive visualizations here... -->
             test data here lorem
             On open, send Ajax request to ${this.timemapUrit}
+            <div id="timemapdata"></div>
           </div>
         </div>
       </div>
@@ -331,7 +332,8 @@ class ReconstructiveBanner extends HTMLElement {
       console.log(`TODO: perform AJAX request to ${this.timemapUrit}`)
       fetch(this.timemapUrit)
       .then(response => response.json()) // even though we can only get link-format or cdxj TMs for now
-      .then(data => console.log(data)).catch(()=>{
+      .then(data => this.showtmindom(data))
+      .catch(()=>{
       // Exception occurred, do something
       })
     };
@@ -346,6 +348,10 @@ class ReconstructiveBanner extends HTMLElement {
         wrapper.style.cssText = localStorage.getItem('bannerPosition') || '';
       }
     };
+
+    this.showtmindom = ((tmdata) => {
+      document.getElementById('tmdata').innerHTML = tmdata
+    })
 
     const datetimeDisplay = this.shadow.getElementById('current');
     datetimeDisplay.onclick = e => {
