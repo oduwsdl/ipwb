@@ -202,7 +202,8 @@ class Reconstructive {
                              prev-urim="${rels.prev && rels.prev.href || ''}"
                              prev-datetime="${rels.prev && rels.prev.datetime || ''}"
                              next-urim="${rels.next && rels.next.href || ''}"
-                             next-datetime="${rels.next && rels.next.datetime || ''}">
+                             next-datetime="${rels.next && rels.next.datetime || ''}"
+                             timemap-urit="${rels.timemap && rels.timemap.href || ''}">
       </reconstructive-banner>
     `;
   }

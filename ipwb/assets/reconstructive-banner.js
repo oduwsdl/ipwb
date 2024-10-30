@@ -291,6 +291,8 @@ class ReconstructiveBanner extends HTMLElement {
           </a>
           <div id="meta">
             <!-- TODO: Add provenance infomration, metadata, and interactive visualizations here... -->
+            test data here lorem
+            On open, send Ajax request to ${this.timemapUrit}
           </div>
         </div>
       </div>
@@ -326,6 +328,12 @@ class ReconstructiveBanner extends HTMLElement {
       wrapper.classList.replace('fab', 'expanded');
       wrapper.style.removeProperty('top');
       wrapper.style.removeProperty('left');
+      console.log(`TODO: perform AJAX request to ${this.timemapUrit}`)
+      fetch(this.timemapUrit)
+      .then(response => response.json()) // even though we can only get link-format or cdxj TMs for now
+      .then(data => console.log(data)).catch(()=>{
+      // Exception occurred, do something
+      })
     };
     this.shadow.getElementById('collapse').onclick = e => {
       e.preventDefault();
