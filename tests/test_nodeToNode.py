@@ -5,10 +5,10 @@ import pytest
 
 
 @pytest.mark.skip(reason='not implemented')
-def test_replayWarc_anotherIPWBInstance_providedCDXJFile():
+def test_replay_replay_another_ipwb_instance_provided_cdxj_file():
     pass
 
 
 @pytest.mark.skip(reason='not implemented')
-def test_replayWarc_anotherIPWBInstance_providedCDXJRecord():
+def test_replay_warc_another_ipwb_instance_provided_cdxj_record():
     pass

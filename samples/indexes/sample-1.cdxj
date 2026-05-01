@@ -1,5 +1,5 @@
 !context ["http://oduwsdl.github.io/contexts/cdxj"]
-!meta {"created_at": "2017-05-31T13:46:51.380204", "generator": "InterPlanetary Wayback v.0.2017.05.31.1322"}
+!meta {"created_at": "2017-05-31T13:46:51.380204", "generator": "InterPlanetary Wayback 0.2017.05.31.1322"}
 com,yahoo,search)/mrss/ 20130411205500 {"locator": "urn:ipfs/Qmd7gw1C84eaDqEcuGTQRj5CA2jKkiEE7ZVCa9pfkrruRY/QmVFeyXN7T3265XMwTrn86tbovTHzJJeHnus2HFCwmbaYh", "mime_type": "text/html", "status_code": "302"}
 org,bitchmagazine)/blogs/feed/ 20130411205457 {"locator": "urn:ipfs/QmbRZEuSFqT214MNZg2iSifq7DCdc9PNbcpb3rDHAHdhyv/Qmb4mXnzpjKwZUgRXw2hupjnTdx6LK71UbCNFCZeR9FvmP", "mime_type": "application/rss+xml", "status_code": "200"}
 org,bitchmagazine)/blogs/girls-of-color-in-dystopia 20130411210315 {"locator": "urn:ipfs/QmQZPeLTuUs4wk3nLzoSawpHEHqnfyZSV3C654pDPBeRMy/QmRDZij54ghXrKoigU9miXjp4crcuoPnKZtSWL81q3Q2As", "mime_type": "text/html", "status_code": "200"}

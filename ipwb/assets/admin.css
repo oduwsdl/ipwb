@@ -11,3 +11,5 @@ details label#daemonStatusLabel {height: 10px; margin-top: 0; vertical-align: to
 details label.twoRowLabel {height: 2.0em;}
 
 form input[type=submit] {display: block; clear: both; margin: 0.5em auto 0 auto;}
+h1 {font-size: 24px; margin-bottom: 0.5em; font-family: sans-serif;}
+h1 img {height: 2.0em;}

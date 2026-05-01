@@ -13,9 +13,10 @@ setup(
     url='https://github.com/oduwsdl/ipwb',
     download_url="https://github.com/oduwsdl/ipwb",
     author='Mat Kelly',
-    author_email='mkelly@cs.odu.edu',
+    author_email='me@matkelly.com',
     description=desc,
     packages=['ipwb'],
+    python_requires='>=3.9',
     license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -24,12 +25,11 @@ setup(
     ],
     install_requires=[
         'warcio>=1.5.3',
-        'ipfshttpclient4ipwb',
-        'Flask==1.1.1',
+        'ipfshttpclient>=0.8.0a',
+        'Flask>=3.0',
         'pycryptodome>=3.4.11',
         'requests>=2.19.1',
         'beautifulsoup4>=4.6.3',
-        'six==1.11.0',
         'surt>=0.3.0'
     ],
     tests_require=[
@@ -56,8 +56,11 @@ setup(
 
         'Environment :: Web Environment',
 
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
 
         'License :: OSI Approved :: MIT License',
 

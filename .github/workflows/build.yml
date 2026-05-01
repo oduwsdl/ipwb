@@ -1,15 +1,26 @@
-name: Build
+name: Docker Build
 
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
 
 jobs:
   build-image:
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
     runs-on: ubuntu-latest
     name: Docker Image
     steps:
-      - uses: actions/checkout@master
-      - name: Lint, Test, and Build Image
-        run: docker image build .
+      - uses: actions/checkout@v4
+      - id: imgtagger
+        run: |
+          imgtags=$(echo "${{ github.ref }}" | sed 's/refs\/tags\//latest,/; s/refs\/heads\///')
+          echo "::set-output name=imgtags::$imgtags"
+      - name: Build and Push to DockerHub
+        uses: docker/build-push-action@v6
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ secrets.DOCKER_REPO }}
+          tags: "${{ steps.imgtagger.outputs.imgtags }}"

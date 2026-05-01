@@ -21,12 +21,13 @@ RUN        mkdir -p /data/{warc,cdxj,ipfs}
 
 # Download and install IPFS
 ENV        IPFS_PATH=/data/ipfs
-ARG        IPFS_VERSION=v0.6.0
+ARG        IPFS_VERSION=v0.31.0
+ARG        BUILDARCH
 RUN        cd /tmp \
-           && wget -q https://dist.ipfs.io/go-ipfs/${IPFS_VERSION}/go-ipfs_${IPFS_VERSION}_linux-amd64.tar.gz \
-           && tar xvfz go-ipfs*.tar.gz \
-           && mv go-ipfs/ipfs /usr/local/bin/ipfs \
-           && rm -rf go-ipfs* \
+           && wget -q https://dist.ipfs.tech/kubo/${IPFS_VERSION}/kubo_${IPFS_VERSION}_linux-$BUILDARCH.tar.gz \
+           && tar xvfz kubo*.tar.gz \
+           && mv kubo/ipfs /usr/local/bin/ipfs \
+           && rm -rf kubo* \
            && ipfs init
 
 # Make necessary changes to prepare the environment for IPWB

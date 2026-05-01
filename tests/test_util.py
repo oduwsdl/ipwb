@@ -24,8 +24,8 @@ from ipwb import util
     ('20181126134200', '201811261342'),
     ('20181126134257', '20181126134257'),
 ])
-def test_padDigits14(expected, input):
-    assert expected == util.padDigits14(input)
+def test_pad_digits14(expected, input):
+    assert expected == util.pad_digits14(input)
 
 
 @pytest.mark.parametrize('input', [
@@ -44,6 +44,6 @@ def test_padDigits14(expected, input):
     '20180102263127',
     '20181126134257.123',
 ])
-def test_padDigits14_inalid(input):
+def test_pad_digits14_inalid(input):
     with pytest.raises(ValueError):
-        util.padDigits14(input, validate=True)
+        util.pad_digits14(input, validate=True)

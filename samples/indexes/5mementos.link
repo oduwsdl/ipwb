@@ -1,0 +1,9 @@
+<http://memento.us/>; rel="original",
+<http://localhost:2016/timemap/link/memento.us>; rel="self timemap"; type="application/link-format",
+<http://localhost:2016/timemap/cdxj/memento.us>; rel="timemap"; type="application/cdxj+ors",
+<http://localhost:2016/timegate/memento.us>; rel="timegate",
+<http://localhost:2016/memento/20130202100000/memento.us/>; rel="first memento"; datetime="Sat, 02 Feb 2013 10:00:00 GMT",
+<http://localhost:2016/memento/20140114100000/memento.us/>; rel="memento"; datetime="Tue, 14 Jan 2014 10:00:00 GMT",
+<http://localhost:2016/memento/20140115101500/memento.us/>; rel="memento"; datetime="Wed, 15 Jan 2014 10:15:00 GMT",
+<http://localhost:2016/memento/20161231110000/memento.us/>; rel="memento"; datetime="Sat, 31 Dec 2016 11:00:00 GMT",
+<http://localhost:2016/memento/20161231110001/memento.us/>; rel="last memento"; datetime="Sat, 31 Dec 2016 11:00:01 GMT"

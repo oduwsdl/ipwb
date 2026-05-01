@@ -234,7 +234,7 @@ function injectIPWBJS () { // eslint-disable-line no-unused-vars
 function getServiceWorkerVersion () {
   return window.fetch(document.location.href)
     .then(function (resp) {
-      return Promise.resolve(resp.headers.get('Server').split('/')[1])
+      return Promise.resolve(resp.headers.get('Server').split('/').at(-1))
     })
 }
 
@@ -291,3 +291,29 @@ function registerServiceWorker () {
     console.log('Browser does not support Service Worker.')
   }
 }
+
+function localizeNumber (numberIn) {
+  let clientLocale = navigator.language
+  if (navigator.languages && navigator.languages.length) {
+    clientLocale = navigator.languages[0]
+  }
+  return new Intl.NumberFormat(clientLocale).format(numberIn)
+}
+
+function setDaemonVersion () {
+  const daemonVersion = document.querySelector('#daemonVersion')
+
+  window.fetch('/ipfsdaemon/version')
+    .then((response) => response.text())
+    .then((txt) => (daemonVersion.innerHTML = txt))
+}
+
+window.addEventListener('DOMContentLoaded', (event) => {
+  const memCount = document.querySelector('#memCountInt')
+  if (!memCount) {
+    return // JS file called from two contexts
+  }
+  memCount.innerHTML = localizeNumber(memCount.innerHTML)
+
+  document.querySelector('#daemonStatus').addEventListener('load', () => { setDaemonVersion() })
+})

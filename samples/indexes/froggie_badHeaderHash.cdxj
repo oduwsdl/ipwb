@@ -1,5 +1,5 @@
-!context ["http://tools.ietf.org/html/rfc7089"]
-!meta {"created_at": "2018-01-30T16:52:43.212606", "generator": "InterPlanetary Wayback v.0.2018.01.10.0435"}
+!context ["https://tools.ietf.org/html/rfc7089"]
+!meta {"created_at": "2018-01-30T16:52:43.212606", "generator": "InterPlanetary Wayback 0.2018.01.10.0435"}
 com,matkelly)/froggies/frog.png 20170301192639 {"locator": "urn:ipfs/QmUeko8zM7Xanwz6F9GtRH4rLAi4Poj3DMECGsci2BRQfs/QmPhMnX74cwqx2xgj9d3N3gTra8CzafXwSbUwU8xagMfqR", "original_uri": "http://matkelly.com/froggies/frog.png", "mime_type": "image/png", "status_code": "200"}
 com,matkelly)/robots.txt 20170301192639 {"locator": "urn:ipfs/Qmbk3Aju7u26Pzk356a43wY9eUCScAJiLPxhvwsMoVt7Pd/QmYNB85U2txRAAdLp6wvZSPvd8AQq8UcjZJ2azhv5h6NF7", "original_uri": "http://matkelly.com/robots.txt", "mime_type": "text/plain", "status_code": "200"}
 edu,odu,cs)/~mkelly/semester/2017_spring/remotefroggie.html 20170301192639 {"locator": "urn:ipfs/QmPdyY7Pm66iWtGpTc7PqK11hvsnYSKMVL57G69RiNjGcm/QmNZ6mKSSAXAmXEocQj5gT4y4kdcr5D2C173ubWJ6PSKEZ", "original_uri": "http://www.cs.odu.edu/~mkelly/semester/2017_spring/remoteFroggie.html", "mime_type": "text/html", "status_code": "200"}

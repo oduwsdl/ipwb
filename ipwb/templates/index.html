@@ -1,5 +1,8 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>InterPlanetary Wayback (ipwb)</title>
 <link rel="stylesheet" href="/ipwbassets/webui.css" />
 <script src="/ipwbassets/webui.js"></script>
@@ -11,6 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="ipwb">
 <meta name="application-name" content="ipwb">
 <meta name="theme-color" content="#ffffff">
+<meta name="description" content="InterPlanetary Wayback replay web interface">
 
 <script>
 let uris = {{ uris|safe }}
@@ -22,15 +26,15 @@ let uris = {{ uris|safe }}
   <div>
     <h1><img src="/ipwbassets/logo.png" alt="ipwb" /></h1>
     <form onsubmit="handleSubmit(); return false;" method="get" action="/memento/*/">
-      <input type="text" placeholder="http://example.com" id="url" name="url" aria-label="Enter a URI" required />
+      <input type="url" placeholder="http://example.com" id="url" name="url" aria-label="Enter a URI" required />
       <input type="submit" value="Search URL in the archive"/>
     </form>
   </div>
   <footer>
-  <p id="memCount"><a id="memCountListLink"><span id="memCountInt">{{ summary.urimCount}}</span></a> Memento<span id="plural">s</span> available</p>
+  <p id="memCount"><a id="memCountListLink"><span id="memCountInt">{{ summary.urim_count}}</span></a> Memento<span id="plural">s</span> available</p>
   <details>
     <summary>Options and Details...</summary>
-      <p><label>Archive Index(es): </label>{{ summary.indexPath }}</p>
+      <p><label>Archive Index(es): </label>{{ summary.index_path }}</p>
       <p><label class="twoRowLabel">Service Worker: </label><div><span id="serviceWorkerVersion">checking...</span><br /><button id="reinstallServiceWorker">Reinstall Service Worker</button></div></p>
       <p><form method="post" action="/upload" enctype="multipart/form-data">
         <label class="twoRowLabel">Upload WARC</label>
@@ -48,7 +52,7 @@ let uris = {{ uris|safe }}
   </footer>
     <div id="uris" class="hidden">
     <h3 id="urisHeader"><abbr title="Uniform Resource Identifiers">URIs</abbr> locally available</h3>
-    <h4 id="htmlCountHeader">{{ pluralize(summary.urimCount, 'memento', 'mementos') }} of {{ pluralize(summary.urirCount, 'resource', 'resources') }} with <span id="htmlPages">{{ summary.htmlCount }}</span>
+    <h4 id="htmlCountHeader">{{ pluralize(summary.urim_count, 'memento', 'mementos') }} of {{ pluralize(summary.urir_count, 'resource', 'resources') }} with <span id="htmlPages">{{ summary.htmlCount }}</span>
         HTML page<span id="htmlPagesPlurality">s</span> listed
         <button id="showEmbeddedURI" data-defaultValue="Show All" data-activatedValue="Show Only HTML Pages">Show All</button></h4>
     <ul id="uriList"></ul>

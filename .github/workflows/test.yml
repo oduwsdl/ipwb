@@ -15,28 +15,33 @@ jobs:
           - macos-latest
           # - windows-latest
         python:
-          - 3.7
-          - 3.8
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
         ipfs:
-          - 0.4
-          - 0.5
-          - 0.6
+          - "0.28"
+          - "0.29"
+          - "0.30"
+          - "0.31"
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} Py-${{ matrix.python }} IPFS-${{ matrix.ipfs }}
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@master
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
       - name: Set up IPFS ${{ matrix.ipfs }}
-        uses: ibnesayeed/setup-ipfs@master
+        uses: oduwsdl/setup-ipfs@main
         with:
           ipfs_version: ${{ matrix.ipfs }}
           run_daemon: true
       - name: Install Python Dependencies
         shell: bash
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r test-requirements.txt
       - name: Run Tests

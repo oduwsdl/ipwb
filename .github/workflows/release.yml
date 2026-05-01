@@ -1,0 +1,46 @@
+name: Draft a Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Extract Repo Attributes
+        id: attrs
+        uses: ibnesayeed/repo-attrs@master
+      - name: Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          body: |
+            ## Changes Since Last Release
+
+            History between `${{ steps.attrs.outputs.tail }}` and `${{ steps.attrs.outputs.head }}`
+
+            ### Pull Requests
+
+            ${{ steps.attrs.outputs.prs }}
+
+            ### Contributors
+
+            ${{ steps.attrs.outputs.contributors }}
+
+            ### Changed Files
+
+            ```
+            ${{ steps.attrs.outputs.files }}
+            ```
