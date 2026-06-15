@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from functools import lru_cache
 from pathlib import Path
 
 from setuptools import setup
@@ -23,13 +24,16 @@ def _load_version():
     raise RuntimeError('Unable to determine package version.')
 
 
-def _load_requirements(group):
+@lru_cache(maxsize=1)
+def _load_pipfile():
     with PIPFILE.open('rb') as fh:
-        dependencies = tomllib.load(fh)
+        return tomllib.load(fh)
 
+
+def _load_requirements(group):
     return [
         package if specifier == '*' else f'{package}{specifier}'
-        for package, specifier in dependencies[group].items()
+        for package, specifier in _load_pipfile()[group].items()
     ]
 
 
