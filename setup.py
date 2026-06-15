@@ -4,20 +4,23 @@ from pathlib import Path
 
 from setuptools import setup
 
-from ipwb import __version__
-
 try:
     import tomllib
 except ModuleNotFoundError:
-    try:
-        import tomli as tomllib
-    except ModuleNotFoundError:
-        from pip._vendor import tomli as tomllib
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parent
+PACKAGE_INIT = ROOT / 'ipwb' / '__init__.py'
 PIPFILE = ROOT / 'Pipfile'
 README = ROOT / 'README.md'
 desc = """InterPlanetary Wayback (ipwb): Web Archive integration with IPFS"""
+
+
+def _load_version():
+    for line in PACKAGE_INIT.read_text().splitlines():
+        if line.startswith('__version__ = '):
+            return line.split('=', 1)[1].strip().strip("'\"")
+    raise RuntimeError('Unable to determine package version.')
 
 
 def _load_requirements(group):
@@ -33,7 +36,7 @@ def _load_requirements(group):
 def get_setup_kwargs():
     return {
         'name': 'ipwb',
-        'version': __version__,
+        'version': _load_version(),
         'url': 'https://github.com/oduwsdl/ipwb',
         'download_url': "https://github.com/oduwsdl/ipwb",
         'author': 'Mat Kelly',
@@ -49,6 +52,9 @@ def get_setup_kwargs():
         ],
         'install_requires': _load_requirements('packages'),
         'tests_require': _load_requirements('dev-packages'),
+        'extras_require': {
+            'test': _load_requirements('dev-packages')
+        },
         'entry_points': """
             [console_scripts]
             ipwb = ipwb.__main__:main

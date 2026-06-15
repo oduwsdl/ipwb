@@ -1,6 +1,11 @@
 import importlib.util
 from pathlib import Path
 
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,27 +19,21 @@ def _load_setup_module():
 
 def test_setup_uses_pipfile_runtime_dependencies():
     setup_module = _load_setup_module()
+    with (ROOT / 'Pipfile').open('rb') as fh:
+        pipfile = tomllib.load(fh)
 
     assert setup_module.get_setup_kwargs()['install_requires'] == [
-        'warcio>=1.5.3',
-        'ipfshttpclient>=0.8.0a',
-        'Flask>=3.0',
-        'pycryptodome>=3.4.11',
-        'requests>=2.19.1',
-        'beautifulsoup4>=4.6.3',
-        'surt>=0.3.0',
-        'multiaddr>=0.0.9',
-        'packaging==23.0'
+        package if specifier == '*' else f'{package}{specifier}'
+        for package, specifier in pipfile['packages'].items()
     ]
 
 
 def test_setup_uses_pipfile_dev_dependencies():
     setup_module = _load_setup_module()
+    with (ROOT / 'Pipfile').open('rb') as fh:
+        pipfile = tomllib.load(fh)
 
     assert setup_module.get_setup_kwargs()['tests_require'] == [
-        'flake8>=3.7.9',
-        'pycodestyle',
-        'pytest>=5.3.5,<9',
-        'pytest-cov',
-        'pytest-flake8'
+        package if specifier == '*' else f'{package}{specifier}'
+        for package, specifier in pipfile['dev-packages'].items()
     ]

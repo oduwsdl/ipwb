@@ -24,21 +24,7 @@ jobs:
     - name: Install Test Dependencies
       run: |
         pip install --upgrade pip
-        python - <<'PY'
-        import subprocess
-        import sys
-        from setup import get_setup_kwargs
-
-        subprocess.check_call([
-            sys.executable,
-            '-m',
-            'pip',
-            'install',
-            *get_setup_kwargs()['tests_require'],
-        ])
-        PY
-    - name: Install IPWB from Source
-      run: pip install .
+        pip install '.[test]'
     - name: Execute Code in Comment
       uses: ibnesayeed/actions-comment-run@master
       with:
