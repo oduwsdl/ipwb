@@ -22,9 +22,9 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
     - name: Install Test Dependencies
-      run: pip install -r test-requirements.txt
-    - name: Install IPWB from Source
-      run: pip install .
+      run: |
+        pip install --upgrade pip
+        pip install '.[test]'
     - name: Execute Code in Comment
       uses: ibnesayeed/actions-comment-run@master
       with:
