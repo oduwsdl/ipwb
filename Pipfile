@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+warcio = ">=1.5.3"
+ipfshttpclient = ">=0.8.0a"
+Flask = ">=3.0"
+pycryptodome = ">=3.4.11"
+requests = ">=2.19.1"
+beautifulsoup4 = ">=4.6.3"
+surt = ">=0.3.0"
+multiaddr = ">=0.0.9"
+packaging = "==23.0"
+
+[dev-packages]
+flake8 = ">=3.7.9"
+pycodestyle = "*"
+pytest = ">=5.3.5,<9"
+pytest-cov = "*"
+pytest-flake8 = "*"

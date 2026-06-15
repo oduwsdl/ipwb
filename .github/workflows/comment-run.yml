@@ -22,7 +22,21 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
     - name: Install Test Dependencies
-      run: pip install -r test-requirements.txt
+      run: |
+        pip install --upgrade pip
+        python - <<'PY'
+        import subprocess
+        import sys
+        from setup import get_setup_kwargs
+
+        subprocess.check_call([
+            sys.executable,
+            '-m',
+            'pip',
+            'install',
+            *get_setup_kwargs()['tests_require'],
+        ])
+        PY
     - name: Install IPWB from Source
       run: pip install .
     - name: Execute Code in Comment

@@ -39,6 +39,14 @@ $ cd ipwb
 $ pip install ./
 ```
 
+Developers who want a managed local environment can use Pipenv with the
+repository's `Pipfile`:
+
+```
+$ pip install pipenv
+$ pipenv install --dev
+```
+
 ## Setup
 
 The InterPlanetary File System (IPFS) daemon (named "kubo", previously "go-ipfs") must be installed and running before starting ipwb. [Download kubo](https://dist.ipfs.tech/#kubo) and [take your node online](https://docs.ipfs.tech/how-to/command-line-quick-start/#take-your-node-online) to start the IPFS daemon. Once installed, this can be done using the command:

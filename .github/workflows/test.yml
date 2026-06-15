@@ -42,8 +42,20 @@ jobs:
         shell: bash
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install -r test-requirements.txt
+          pip install .
+          python - <<'PY'
+          import subprocess
+          import sys
+          from setup import get_setup_kwargs
+
+          subprocess.check_call([
+              sys.executable,
+              '-m',
+              'pip',
+              'install',
+              *get_setup_kwargs()['tests_require'],
+          ])
+          PY
       - name: Run Tests
         shell: bash
         run: py.test -s --cov=./
