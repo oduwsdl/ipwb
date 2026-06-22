@@ -49,6 +49,7 @@ def test_replay_404(warc, lookup, has_md_header):
     ('2mementos_queryString.warc',
      '/memento/20130202100000/memento.us/' +
      'index.php?anotherval=ipsum&someval=lorem', 200, None),
+    ('my-collection.wacz', 'memento/*/memento.us', 200, None),
 ])
 def test_replay_search(warc, lookup, status, location):
     ipwb_test.start_replay(warc)

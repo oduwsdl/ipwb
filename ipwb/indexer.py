@@ -17,6 +17,7 @@ import ipfshttpclient as ipfsapi
 import zlib
 import surt
 import ntpath
+import shutil
 import traceback
 import tempfile
 
@@ -29,6 +30,8 @@ from ipfshttpclient.exceptions import ConnectionError
 # from requests.exceptions import ConnectionError
 
 from ipwb.util import iso8601_to_digits14, ipfs_client
+from ipwb.util import is_wacz, extract_warcs_from_wacz
+from ipwb.util import cleanup_warc_files_extracted_from_wacz
 
 import requests
 import datetime
@@ -119,6 +122,21 @@ def index_file_at(warc_paths, encryption_key=None,
     for warc_path in warc_paths:
         verify_file_exists(warc_path)
 
+    # Extract WARCs from any WACZ files
+    warc_paths_to_append = []
+    wacz_paths = []
+    for warc_path in warc_paths:
+        if is_wacz(warc_path):
+            (w_paths, dirs_to_cleanup) = extract_warcs_from_wacz(warc_path)
+            warc_paths_to_append += w_paths
+            wacz_paths.append(warc_path)
+
+    # Manipulate list of WARCs extracted from WACZ
+    for ptr in wacz_paths:
+        warc_paths.remove(ptr)
+
+    warc_paths = warc_paths + warc_paths_to_append
+
     cdxj_lines = []
 
     if outfile:
@@ -167,6 +185,8 @@ def index_file_at(warc_paths, encryption_key=None,
     cdxj_metadata_lines = generate_cdxj_metadata(cdxj_lines)
     cdxj_lines = cdxj_metadata_lines + cdxj_lines
 
+    cleanup_warc_files_extracted_from_wacz(warc_paths_to_append)
+
     if quiet:
         return cdxj_lines
 
@@ -179,6 +199,10 @@ def index_file_at(warc_paths, encryption_key=None,
         output_file.close()
     else:
         print('\n'.join(cdxj_lines))
+
+    # Cleanup, e.g., dirs for WARCs from WACZ
+    for dir_to_cleanup in dirs_to_cleanup:
+        shutil.rmtree(dir_to_cleanup)
 
 
 def sanitize_cdxj_line(cdxj_line):
